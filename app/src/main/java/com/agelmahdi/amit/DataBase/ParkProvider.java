@@ -29,11 +29,10 @@ public class ParkProvider extends ContentProvider {
 
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
 
-        final String authority = ParkContract.CONTENT_AUTHORITY;
 
-        matcher.addURI(authority, ParkContract.PATH_PARK, PARK);
+        matcher.addURI(ParkContract.AUTHORITY, ParkContract.PATH_PARK, PARK);
 
-        matcher.addURI(authority, ParkContract.PATH_PARK + "/#", PARK_WITH_ID);
+        matcher.addURI(ParkContract.AUTHORITY, ParkContract.PATH_PARK + "/#", PARK_WITH_ID);
 
         return matcher;
 

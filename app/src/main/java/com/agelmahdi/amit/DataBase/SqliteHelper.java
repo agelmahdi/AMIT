@@ -11,7 +11,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class SqliteHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "park.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     public SqliteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -29,13 +29,13 @@ public class SqliteHelper extends SQLiteOpenHelper {
 
                         ParkContract.ParkEntry.COLUMN_USER_ID      + " INTEGER NOT NULL, "                 +
 
-                        ParkContract.ParkEntry.COLUMN_USER_NAME + " TEXT ,"                  +
+                        ParkContract.ParkEntry.COLUMN_USER_NAME + " TEXT,"                  +
 
-                        ParkContract.ParkEntry.COLUMN_ADDRESS   + " TEXT , "                    +
+                        ParkContract.ParkEntry.COLUMN_ADDRESS   + " TEXT, "                    +
 
                         ParkContract.ParkEntry.COLUMN_LNG   + " NUMERIC, "                    +
 
-                        ParkContract.ParkEntry.COLUMN_LAT   + " NUMERIC );";
+                        ParkContract.ParkEntry.COLUMN_LAT   + " NUMERIC);";
 
 
         sqLiteDatabase.execSQL(SQL_CREATE_PARK_TABLE);

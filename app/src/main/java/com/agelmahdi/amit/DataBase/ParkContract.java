@@ -9,17 +9,16 @@ import android.provider.BaseColumns;
 
 public class ParkContract {
 
-    public static final String CONTENT_AUTHORITY = "com.agelmahdi.amit";
+    public static final String AUTHORITY = "com.agelmahdi.amit";
 
-    public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+    private static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
 
     public static final String PATH_PARK = "park";
 
     public static final class ParkEntry implements BaseColumns {
 
-        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
-                .appendPath(PATH_PARK)
-                .build();
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_PARK).build();
 
         public static final String TABLE_NAME = "park";
 
