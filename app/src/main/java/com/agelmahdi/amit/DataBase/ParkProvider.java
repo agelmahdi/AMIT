@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import static com.agelmahdi.amit.DataBase.ParkContract.ParkEntry.TABLE_NAME;
 
@@ -80,6 +81,7 @@ public class ParkProvider extends ContentProvider {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
+
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
@@ -143,6 +145,27 @@ public class ParkProvider extends ContentProvider {
 
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        int count = 0;
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+
+        int match = sUriMatcher.match(uri);
+
+        switch (match){
+            case PARK:
+                //
+                break;
+            case PARK_WITH_ID:
+                String rowID = uri.getPathSegments().get(1);
+                s = ParkContract.ParkEntry._ID + "=" + rowID
+                        + (!TextUtils.isEmpty(s) ?
+                        " AND (" + s + ')' : "");
+                count = db.update(TABLE_NAME,contentValues, s, strings);
+
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown URI: " + uri);
+        }
+        getContext().getContentResolver().notifyChange(uri, null);
+        return count;
     }
 }

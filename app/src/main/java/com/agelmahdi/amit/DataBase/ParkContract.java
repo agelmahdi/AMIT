@@ -33,7 +33,11 @@ public class ParkContract {
         public static final String COLUMN_LNG = "lng";
 
     }
-
+    public static Uri buildUriWithID(int id) {
+        return ParkContract.ParkEntry.CONTENT_URI.buildUpon()
+                .appendPath(Integer.toString(id))
+                .build();
+    }
 
 
 

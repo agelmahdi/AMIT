@@ -1,12 +1,15 @@
 package com.agelmahdi.amit;
 
+import android.app.Dialog;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -15,6 +18,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.agelmahdi.amit.Application.ParkApp;
@@ -34,9 +41,9 @@ import butterknife.ButterKnife;
 import rx.Observable;
 
 public class MainActivity extends AppCompatActivity implements ParkView,
-        LoaderManager.LoaderCallbacks<Cursor> {
+        LoaderManager.LoaderCallbacks<Cursor>, ParkAdapter.ParkAdapterOnClickHandler {
     private static final String TAG = MainActivity.class.getSimpleName();
-
+    private String input;
     private static final String[] PARKS_PROJECTION = {
             ParkContract.ParkEntry.COLUMN_USER_ID,
             ParkContract.ParkEntry.COLUMN_USER_NAME,
@@ -101,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements ParkView,
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
-        mParkAdapter = new ParkAdapter(new ArrayList<Datum>());
+        mParkAdapter = new ParkAdapter(new ArrayList<Datum>(), this);
         mRecyclerView.setAdapter(mParkAdapter);
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
@@ -188,7 +195,47 @@ public class MainActivity extends AppCompatActivity implements ParkView,
 
     }
 
-    public class SaveIntoDatabase extends AsyncTask<Datum, Void, Void> {
+    @Override
+    public void onClickPark(final int id) {
+        LayoutInflater li = LayoutInflater.from(this);
+        View dialogView = li.inflate(R.layout.dialog_items, null);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                this);
+        alertDialogBuilder.setView(dialogView);
+        final EditText userInput = (EditText) dialogView
+                .findViewById(R.id.edit_text);
+
+        alertDialogBuilder.setCancelable(false)
+                .setPositiveButton("Update", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        input = userInput.getText().toString();
+                        if (!input.isEmpty()) {
+                            Uri uriIdClicked = ParkContract.buildUriWithID(id);
+                            ContentValues updateValues = new ContentValues();
+                            updateValues.put(ParkContract.ParkEntry.COLUMN_USER_NAME, input);
+                            getContentResolver().update(uriIdClicked, updateValues, ParkContract.ParkEntry._ID + "=" + id, null);
+                            getSupportLoaderManager().restartLoader(TASK_LOADER_ID, null, MainActivity.this);
+
+                            Toast.makeText(getApplicationContext(), "Parks id: " + id + " Updated!", Toast.LENGTH_SHORT).show();
+
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Error Update!", Toast.LENGTH_SHORT).show();
+
+                        }
+                    }
+                }).setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,
+                                        int id) {
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+
+    private class SaveIntoDatabase extends AsyncTask<Datum, Void, Void> {
         @Override
         protected Void doInBackground(Datum... data) {
             Datum datum = data[0];

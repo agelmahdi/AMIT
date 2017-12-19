@@ -18,9 +18,13 @@ import java.util.List;
 public class ParkAdapter extends RecyclerView.Adapter<ParkAdapter.Holder> {
     private List<Datum> mPark;
     private Cursor mCursor;
-
-    public ParkAdapter(List<Datum> mPark) {
+    private final ParkAdapterOnClickHandler mClickHandler;
+    public interface ParkAdapterOnClickHandler {
+        void onClickPark(int id);
+    }
+    public ParkAdapter(List<Datum> mPark,ParkAdapterOnClickHandler mClickHandler) {
         this.mPark = mPark;
+        this.mClickHandler=mClickHandler;
     }
 
     @Override
@@ -70,13 +74,22 @@ public class ParkAdapter extends RecyclerView.Adapter<ParkAdapter.Holder> {
 
     }
 
-    public class Holder extends RecyclerView.ViewHolder {
+    public class Holder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView mName, mAddress,mLnglat;
         public Holder(View itemView) {
             super(itemView);
             mName = itemView.findViewById(R.id.name);
             mAddress=itemView.findViewById(R.id.address);
             mLnglat=itemView.findViewById(R.id.lnglat);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            int adapterPosition = getAdapterPosition();
+            mCursor.moveToPosition(adapterPosition);
+            int id = mCursor.getInt(MainActivity.COL_NUM_ID);
+            mClickHandler.onClickPark(id);
         }
     }
 }
